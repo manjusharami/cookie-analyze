@@ -1,21 +1,32 @@
-# Compiled binaries
-/cookie_analyzer
-most_active_cookie
+ # Go build binaries
+cookie_analyzer
 *.exe
 *.exe.manifest
 *.dll
 *.so
 *.dylib
 
-# Test artifacts
+# Build output directories
+/bin/
+/dist/
+/out/
+
+# Test & coverage artifacts
 *.out
 *.test
 *.prof
+coverage.out
+
+# CSV logs (should not be committed)
+cookie_log.csv
+log.csv
 
 # OS & IDE files
 .DS_Store
 .idea/
 .vscode/
 *.swp
-cookie_log.csv
-log.csv
+
+# Temporary files
+*.tmp
+*.temp
