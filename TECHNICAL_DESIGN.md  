@@ -1,0 +1,199 @@
+Technical Design & Architecture
+
+1. Overview
+
+This document describes the internal architecture, design decisions, and execution flow of the Most Active Cookie Analyzer CLI tool. It explains how the system processes log files, computes cookie frequencies, and returns the most active cookie(s) for a given UTC date.
+
+2. High‑Level Architecture
+
+Core Components
+
+CLI Layer — Parses flags (-f, -d), validates input, and triggers execution.
+
+Analyzer Engine — Reads the CSV file, filters entries by date, counts frequencies, and returns the result.
+
+Integration Tests — Validate end‑to‑end behavior across CLI + analyzer.
+
+Architecture Diagram 
+
+          ┌──────────────┐
+          │     CLI       │
+          │  (cli.go)     │
+          └──────┬────────┘
+                 │
+                 ▼
+        ┌───────────────────┐
+        │   Analyzer Engine │
+        │  (analyzer.go)    │
+        └──────┬────────────┘
+               │
+               ▼
+        ┌───────────────────┐
+        │   CSV Log Reader  │
+        │ (streaming parse) │
+        └───────────────────┘
+
+3. Data Flow
+
+ 3.1. CLI parses flags
+
+Validates file path
+
+Validates date format (YYYY-MM-DD)
+
+3.2 Analyzer opens CSV file
+
+Uses buffered streaming to avoid loading entire file
+
+3.3 Each row is processed
+
+Parse cookie + timestamp
+
+Convert timestamp → UTC date
+
+If date matches target:
+
+Increment frequency counter
+
+3.4 After file scan
+
+Determine max frequency
+
+Collect all cookies with that frequency
+
+3.5 Return results
+
+CLI prints each cookie on a new line
+
+4. Key Design Decisions
+
+4.1 Streaming File Processing
+
+Avoids loading entire CSV into memory
+
+Supports very large log files
+
+Uses bufio.Scanner for efficient line-by-line reading
+
+4.2 UTC Date Normalization
+
+All timestamps converted to UTC
+
+Ensures correctness across time zones
+
+Uses time.Parse(time.RFC3339)
+
+4.3 Frequency Map
+
+map[string]int used for O(1) increments
+
+Single pass through file → O(n) complexity
+
+4.4 Deterministic Output
+
+Cookies printed in the order they appear in the log
+
+No sorting required
+
+Matches problem specification
+
+5. Error Handling Strategy
+
+Handled Errors
+
+Missing file
+
+Invalid file path
+
+Invalid date format
+
+Malformed CSV rows
+
+Empty results (no cookies for date)
+
+Behavior
+
+CLI prints descriptive error messages
+
+Non-zero exit code for failures
+
+6. Testing Strategy
+
+Unit Tests
+
+Analyzer logic
+
+Date parsing
+
+Frequency counting
+
+Edge cases (ties, no matches, malformed rows)
+
+CLI Tests
+
+Flag parsing
+
+Error scenarios
+
+Integration with analyzer
+
+Integration Tests
+
+Full end‑to‑end execution
+
+Real sample CSV files
+
+Coverage
+
+100% statement coverage
+
+Coverage report generated via:
+
+make test-coverage
+
+7. Performance Considerations
+
+Time Complexity
+O(n) — single pass through log file
+
+Memory Complexity
+O(k) — number of unique cookies for the target date
+
+Independent of total file size
+
+Scalability
+Can handle millions of rows
+
+Streaming ensures low memory footprint
+
+8. Dependencies
+
+Go standard library only
+
+bufio
+
+flag
+
+time
+
+encoding/csv
+
+
+9. File Structure Reference
+
+most_active_cookie/
+├── cmd/
+│   ├── main.go
+│   └── main_test.go
+├── internal/
+│   ├── analyzer/
+│   │   ├── analyzer.go
+│   │   └── analyzer_test.go
+│   └── cli/
+│       ├── cli.go
+│       └── cli_test.go
+├── tests/
+│   └── integration_test.go
+├── TECHNICAL_DESIGN.md
+├── README.md
+└── Makefile
