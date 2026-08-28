@@ -61,8 +61,9 @@ Memory: Sufficient memory is available to process the file.
 
 Sorting: The log file is pre-sorted by timestamp in descending order (most recent occurrence is on the first line).
 
-Project Structure
+ ## Project Structure
 
+```text
 most_active_cookie/
 ├── cmd/
 │   ├── main.go              # CLI binary entry point
