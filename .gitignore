@@ -1,5 +1,6 @@
 # Compiled binaries
 /cookie_analyzer
+most_active_cookie
 *.exe
 *.exe.manifest
 *.dll
