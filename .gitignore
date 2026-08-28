@@ -1,0 +1,20 @@
+# Compiled binaries
+/cookie_analyzer
+*.exe
+*.exe.manifest
+*.dll
+*.so
+*.dylib
+
+# Test artifacts
+*.out
+*.test
+*.prof
+
+# OS & IDE files
+.DS_Store
+.idea/
+.vscode/
+*.swp
+cookie_log.csv
+log.csv
